@@ -386,6 +386,43 @@ extension Tagged: Numeric, SignedNumeric, FloatingPoint where RawValue: Floating
   }
 }
 
+extension Tagged: BinaryFloatingPoint where RawValue: BinaryFloatingPoint {
+  public typealias RawSignificand = RawValue.RawSignificand
+  public typealias RawExponent = RawValue.RawExponent
+
+  public init(
+    sign: FloatingPointSign,
+    exponentBitPattern: RawExponent,
+    significandBitPattern: RawSignificand
+  ) {
+    self.init(rawValue: .init(
+      sign: sign,
+      exponentBitPattern: exponentBitPattern,
+      significandBitPattern: significandBitPattern
+    ))
+  }
+
+  public static var exponentBitCount: Int { RawValue.exponentBitCount }
+
+  public static var significandBitCount: Int { RawValue.significandBitCount }
+
+  public var exponentBitPattern: RawExponent {
+    self.rawValue.exponentBitPattern
+  }
+
+  public var significandBitPattern: RawSignificand {
+    self.rawValue.significandBitPattern
+  }
+
+  public var binade: Self {
+    Self.init(rawValue: self.rawValue.binade)
+  }
+
+  public var significandWidth: Int {
+    self.rawValue.significandWidth
+  }
+}
+
 extension Tagged: Hashable where RawValue: Hashable {}
 
 //extension Tagged: SignedNumeric where RawValue: FixedWidthInteger {}

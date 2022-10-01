@@ -206,65 +206,189 @@ extension Tagged: AdditiveArithmetic where RawValue: AdditiveArithmetic {
   }
 }
 
-extension Tagged: Numeric where RawValue: Numeric {
-  public init?<T>(exactly source: T) where T: BinaryInteger {
-    guard let rawValue = RawValue(exactly: source) else { return nil }
-    self.init(rawValue: rawValue)
-  }
-
-  public var magnitude: RawValue.Magnitude {
-    return self.rawValue.magnitude
-  }
-
-  public static func * (lhs: Tagged, rhs: Tagged) -> Tagged {
-    return self.init(rawValue: lhs.rawValue * rhs.rawValue)
-  }
-
-  public static func *= (lhs: inout Tagged, rhs: Tagged) {
-    lhs.rawValue *= rhs.rawValue
-  }
-}
-#else
-extension Tagged: Numeric where RawValue: Numeric {
-  public typealias Magnitude = RawValue.Magnitude
-
-  public init?<T>(exactly source: T) where T: BinaryInteger {
-    guard let rawValue = RawValue(exactly: source) else { return nil }
-    self.init(rawValue: rawValue)
-  }
-  public var magnitude: RawValue.Magnitude {
-    return self.rawValue.magnitude
-  }
-
-  public static func + (lhs: Tagged<Tag, RawValue>, rhs: Tagged<Tag, RawValue>) -> Tagged<Tag, RawValue> {
-    return self.init(rawValue: lhs.rawValue + rhs.rawValue)
-  }
-
-  public static func += (lhs: inout Tagged<Tag, RawValue>, rhs: Tagged<Tag, RawValue>) {
-    lhs.rawValue += rhs.rawValue
-  }
-
-  public static func * (lhs: Tagged, rhs: Tagged) -> Tagged {
-    return self.init(rawValue: lhs.rawValue * rhs.rawValue)
-  }
-
-  public static func *= (lhs: inout Tagged, rhs: Tagged) {
-    lhs.rawValue *= rhs.rawValue
-  }
-
-  public static func - (lhs: Tagged, rhs: Tagged) -> Tagged<Tag, RawValue> {
-    return self.init(rawValue: lhs.rawValue - rhs.rawValue)
-  }
-
-  public static func -= (lhs: inout Tagged<Tag, RawValue>, rhs: Tagged<Tag, RawValue>) {
-    lhs.rawValue -= rhs.rawValue
-  }
-}
+//extension Tagged: Numeric where RawValue: Numeric {
+//  public init?<T>(exactly source: T) where T: BinaryInteger {
+//    guard let rawValue = RawValue(exactly: source) else { return nil }
+//    self.init(rawValue: rawValue)
+//  }
+//
+//  public var magnitude: RawValue.Magnitude {
+//    return self.rawValue.magnitude
+//  }
+//
+//  public static func * (lhs: Tagged, rhs: Tagged) -> Tagged {
+//    return self.init(rawValue: lhs.rawValue * rhs.rawValue)
+//  }
+//
+//  public static func *= (lhs: inout Tagged, rhs: Tagged) {
+//    lhs.rawValue *= rhs.rawValue
+//  }
+//}
+//#else
+//extension Tagged: Numeric where RawValue: Numeric {
+//  public typealias Magnitude = RawValue.Magnitude
+//
+//  public init?<T>(exactly source: T) where T: BinaryInteger {
+//    guard let rawValue = RawValue(exactly: source) else { return nil }
+//    self.init(rawValue: rawValue)
+//  }
+//  public var magnitude: RawValue.Magnitude {
+//    return self.rawValue.magnitude
+//  }
+//
+//  public static func + (lhs: Tagged<Tag, RawValue>, rhs: Tagged<Tag, RawValue>) -> Tagged<Tag, RawValue> {
+//    return self.init(rawValue: lhs.rawValue + rhs.rawValue)
+//  }
+//
+//  public static func += (lhs: inout Tagged<Tag, RawValue>, rhs: Tagged<Tag, RawValue>) {
+//    lhs.rawValue += rhs.rawValue
+//  }
+//
+//  public static func * (lhs: Tagged, rhs: Tagged) -> Tagged {
+//    return self.init(rawValue: lhs.rawValue * rhs.rawValue)
+//  }
+//
+//  public static func *= (lhs: inout Tagged, rhs: Tagged) {
+//    lhs.rawValue *= rhs.rawValue
+//  }
+//
+//  public static func - (lhs: Tagged, rhs: Tagged) -> Tagged<Tag, RawValue> {
+//    return self.init(rawValue: lhs.rawValue - rhs.rawValue)
+//  }
+//
+//  public static func -= (lhs: inout Tagged<Tag, RawValue>, rhs: Tagged<Tag, RawValue>) {
+//    lhs.rawValue -= rhs.rawValue
+//  }
+//}
 #endif
+
+extension Tagged: Numeric, SignedNumeric, FloatingPoint where RawValue: FloatingPoint {
+  public typealias Exponent = RawValue.Exponent
+  public typealias Magnitude = Self
+
+  public init?<T>(exactly source: T) where T: BinaryInteger {
+    guard let rawValue = RawValue(exactly: source) else { return nil }
+    self.init(rawValue: rawValue)
+  }
+
+  public static func * (lhs: Tagged, rhs: Tagged) -> Tagged {
+    return self.init(rawValue: lhs.rawValue * rhs.rawValue)
+  }
+
+  public static func *= (lhs: inout Tagged, rhs: Tagged) {
+    lhs.rawValue *= rhs.rawValue
+  }
+
+  public init(sign: FloatingPointSign, exponent: RawValue.Exponent, significand: Self) {
+    self.init(rawValue: .init(sign: sign, exponent: exponent, significand: significand.rawValue))
+  }
+
+  public init(signOf: Self, magnitudeOf: Self) {
+    self.init(rawValue: .init(signOf: signOf.rawValue, magnitudeOf: magnitudeOf.rawValue))
+  }
+
+  public init(_ value: Int) {
+    self.init(rawValue: .init(value))
+  }
+
+  public init<Source>(_ value: Source) where Source: BinaryInteger {
+    self.init(rawValue: .init(value))
+  }
+
+  public var magnitude: Self { Self.init(rawValue: self.rawValue.magnitude) }
+
+  public static var radix: Int { Self.RawValue.radix }
+
+  public static var nan: Self { Self.init(rawValue: .nan) }
+
+  public static var signalingNaN: Self { Self.init(rawValue: .signalingNaN) }
+
+  public static var infinity: Self { Self.init(rawValue: .infinity) }
+
+  public static var greatestFiniteMagnitude: Self { Self.init(rawValue: .greatestFiniteMagnitude) }
+
+  public static var pi: Self { Self.init(rawValue: .pi) }
+
+  public var ulp: Self { Self.init(rawValue: self.rawValue.ulp) }
+
+  public static var leastNormalMagnitude: Self { Self.init(rawValue: .leastNormalMagnitude) }
+
+  public static var leastNonzeroMagnitude: Self { Self.init(rawValue: .leastNonzeroMagnitude) }
+
+  public var sign: FloatingPointSign { self.rawValue.sign }
+
+  public var exponent: RawValue.Exponent { self.rawValue.exponent }
+
+  public var significand: Self { Self.init(rawValue: self.rawValue.significand) }
+
+  public static func / (lhs: Self, rhs: Self) -> Self {
+    Self.init(rawValue: lhs.rawValue / rhs.rawValue)
+  }
+
+  public static func /= (lhs: inout Self, rhs: Self) {
+    lhs.rawValue /= rhs.rawValue
+  }
+
+  public mutating func formRemainder(dividingBy other: Self) {
+    self.rawValue.formRemainder(dividingBy: other.rawValue)
+  }
+
+  public mutating func formTruncatingRemainder(dividingBy other: Self) {
+    self.rawValue.formTruncatingRemainder(dividingBy: other.rawValue)
+  }
+
+  public mutating func formSquareRoot() {
+    self.rawValue.formSquareRoot()
+  }
+
+  public mutating func addProduct(_ lhs: Self, _ rhs: Self) {
+    self.rawValue.addProduct(lhs.rawValue, rhs.rawValue)
+  }
+
+  public var nextUp: Self {
+    Self.init(rawValue: self.rawValue.nextUp)
+  }
+
+  public func isEqual(to other: Self) -> Bool {
+    self.rawValue.isEqual(to: other.rawValue)
+  }
+
+  public func isLess(than other: Self) -> Bool {
+    self.rawValue.isLess(than: other.rawValue)
+  }
+
+  public func isLessThanOrEqualTo(_ other: Self) -> Bool {
+    self.rawValue.isLessThanOrEqualTo(other.rawValue)
+  }
+
+  public func isTotallyOrdered(belowOrEqualTo other: Self) -> Bool {
+    self.rawValue.isTotallyOrdered(belowOrEqualTo: other.rawValue)
+  }
+
+  public var isNormal: Bool { self.rawValue.isNormal }
+
+  public var isFinite: Bool { self.rawValue.isFinite }
+
+  public var isZero: Bool { self.rawValue.isZero }
+
+  public var isSubnormal: Bool { self.rawValue.isSubnormal }
+
+  public var isInfinite: Bool { self.rawValue.isInfinite }
+
+  public var isNaN: Bool { self.rawValue.isNaN }
+
+  public var isSignalingNaN: Bool { self.rawValue.isSignalingNaN }
+
+  public var isCanonical: Bool { self.rawValue.isCanonical }
+
+  public mutating func round(_ rule: FloatingPointRoundingRule) {
+    self.rawValue.round(rule)
+  }
+}
 
 extension Tagged: Hashable where RawValue: Hashable {}
 
-extension Tagged: SignedNumeric where RawValue: SignedNumeric {}
+//extension Tagged: SignedNumeric where RawValue: FixedWidthInteger {}
 
 extension Tagged: Sequence where RawValue: Sequence {
   public typealias Iterator = RawValue.Iterator

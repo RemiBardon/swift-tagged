@@ -129,8 +129,12 @@ final class TaggedTests: XCTestCase {
     XCTAssertEqual(Tagged<Tag, Int>(rawValue: 1).hashValue, Tagged<Tag, Int>(rawValue: 1).hashValue)
   }
 
+//  func testSignedNumeric() {
+//    XCTAssertEqual(Tagged<Tag, Int>(rawValue: -1), -Tagged<Tag, Int>(rawValue: 1))
+//  }
+
   func testSignedNumeric() {
-    XCTAssertEqual(Tagged<Tag, Int>(rawValue: -1), -Tagged<Tag, Int>(rawValue: 1))
+    XCTAssertEqual(Tagged<Tag, Float>(rawValue: -1), -Tagged<Tag, Float>(rawValue: 1))
   }
 
   func testMap() {

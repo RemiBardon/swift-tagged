@@ -402,6 +402,10 @@ extension Tagged: BinaryFloatingPoint where RawValue: BinaryFloatingPoint {
     ))
   }
 
+  public init<Source>(_ value: Source) where Source: BinaryFloatingPoint {
+    self.init(rawValue: .init(value))
+  }
+
   public static var exponentBitCount: Int { RawValue.exponentBitCount }
 
   public static var significandBitCount: Int { RawValue.significandBitCount }
